@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/40f42f5b6e4bcf0967f32c72b/5e162dafb5861f57487d5228d.js");</script>
+    <!-- Mailchimp tracking script -->
+    <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/40f42f5b6e4bcf0967f32c72b/5e162dafb5861f57487d5228d.js");</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOKYO RAT - Coming Soon</title>
@@ -142,33 +143,8 @@
             z-index: 0;
         }
 
-        /* Animations */
-        @keyframes glitch-1 {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(2px, -2px); }
-            40% { transform: translate(-2px, 2px); }
-            60% { transform: translate(1px, -1px); }
-            80% { transform: translate(-1px, 1px); }
-        }
-
-        @keyframes glitch-2 {
-            0%, 100% { transform: translate(0); }
-            25% { transform: translate(-2px, 0) scale(1.02); }
-            50% { transform: translate(2px, -1px) scale(0.98); }
-            75% { transform: translate(-1px, 1px) scale(1.02); }
-        }
-
-        @keyframes flicker {
-            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
-            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-         .popup-overlay {
+        /* Popup Styles */
+        .popup-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -242,6 +218,44 @@
             text-shadow: 0 0 5px #000;
         }
 
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #0ff;
+            border: none;
+            background: none;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Animations */
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(-2px, 2px); }
+            60% { transform: translate(1px, -1px); }
+            80% { transform: translate(-1px, 1px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-2px, 0) scale(1.02); }
+            50% { transform: translate(2px, -1px) scale(0.98); }
+            75% { transform: translate(-1px, 1px) scale(1.02); }
+        }
+
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
         @keyframes glitch {
             0% { opacity: 1; }
             50% { opacity: 0.98; }
@@ -252,17 +266,6 @@
             0% { opacity: 0.5; }
             50% { opacity: 1; }
             100% { opacity: 0.5; }
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #0ff;
-            border: none;
-            background: none;
-            font-size: 1.5em;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -283,18 +286,25 @@
         <div class="reveal-text" id="reveal-text"></div>
     </div>
 
-  <div class="popup-overlay" id="emailPopup">
-    <div class="popup-content">
-        <button class="close-btn" onclick="closePopup()">×</button>
-        <div class="popup-header">
-            >> INITIATE_CONNECTION_SEQUENCE
+    <!-- Updated Mailchimp Popup Form -->
+    <div class="popup-overlay" id="emailPopup">
+        <div class="popup-content">
+            <button class="close-btn" onclick="closePopup()">×</button>
+            <div class="popup-header">
+                >> INITIATE_CONNECTION_SEQUENCE
+            </div>
+            <form action="https://tokyoratmusic.us5.list-manage.com/subscribe/post?u=40f42f5b6e4bcf0967f32c72b&amp;id=7a3e84940e&amp;f_id=00e2bfedf0" method="POST" id="emailForm" name="mc-embedded-subscribe-form" target="_blank">
+                <input type="email" name="EMAIL" class="email-input" placeholder="Enter your neural link ID (email)" required>
+                <!-- Bot prevention field -->
+                <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                    <input type="text" name="b_40f42f5b6e4bcf0967f32c72b_7a3e84940e" tabindex="-1" value="">
+                </div>
+                <button type="submit" class="submit-btn">ESTABLISH UPLINK</button>
+            </form>
         </div>
-        <form id="emailForm" action="https://chimpstatic.com/mcjs-connected/js/users/40f42f5b6e4bcf0967f32c72b/5e162dafb5861f57487d5228d.js" method="POST">
-            <input type="email" name="email" class="email-input" placeholder="Enter your neural link ID (email)" required>
-            <button type="submit" class="submit-btn">ESTABLISH UPLINK</button>
-        </form>
     </div>
 
+    <!-- Scripts -->
     <script>
         // Custom cursor
         document.addEventListener('mousemove', (e) => {
@@ -383,25 +393,19 @@
         }
 
         setInterval(createBinaryStream, 200);
+
+        // Popup functionality
+        setTimeout(() => {
+            document.getElementById('emailPopup').style.display = 'block';
+        }, 3000);
+
+        function closePopup() {
+            document.getElementById('emailPopup').style.display = 'none';
+        }
+
+        document.getElementById('emailForm').addEventListener('submit', function() {
+            closePopup();
+        });
     </script>
-  <script>
-    // Show popup after 3 seconds
-    setTimeout(() => {
-        document.getElementById('emailPopup').style.display = 'block';
-    }, 3000);
-
-    function closePopup() {
-        document.getElementById('emailPopup').style.display = 'none';
-    }
-
-    // Replace 'YOUR_MAILCHIMP_ENDPOINT' in the form action with your actual Mailchimp endpoint
-    document.getElementById('emailForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Add your Mailchimp API integration code here
-        // You'll need to replace this with actual Mailchimp API calls
-        console.log('Form submitted');
-    });
-</script>
-
 </body>
 </html>
