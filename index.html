@@ -144,30 +144,30 @@
         }
 
         /* Popup Styles */
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            animation: glitch 0.3s infinite;
-        }
+      .popup-overlay {
+    display: none;
+    position: fixed;
+    bottom: 0;  /* Changed from top: 0 */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);  /* Made slightly more transparent */
+    z-index: 1000;
+}
 
-        .popup-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(45deg, #0a0a2e, #1a1a3a);
-            border: 2px solid #0ff;
-            padding: 2em;
-            box-shadow: 0 0 20px #0ff, inset 0 0 20px #0ff;
-            max-width: 400px;
-            width: 90%;
-        }
+.popup-content {
+    position: fixed;  /* Changed from absolute */
+    bottom: -100%;  /* Start below the screen */
+    left: 50%;
+    transform: translateX(-50%);  /* Only transform X axis */
+    background: linear-gradient(45deg, #0a0a2e, #1a1a3a);
+    border: 2px solid #0ff;
+    padding: 2em;
+    box-shadow: 0 0 20px #0ff, inset 0 0 20px #0ff;
+    max-width: 400px;
+    width: 90%;
+    transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
         .popup-content::before {
             content: '';
@@ -395,17 +395,35 @@
         setInterval(createBinaryStream, 200);
 
         // Popup functionality
-        setTimeout(() => {
-            document.getElementById('emailPopup').style.display = 'block';
-        }, 3000);
+      function showPopup() {
+    const overlay = document.getElementById('emailPopup');
+    const content = overlay.querySelector('.popup-content');
+    
+    overlay.classList.add('active');
+    // Small delay to ensure the transition works
+    setTimeout(() => {
+        content.classList.add('active');
+    }, 10);
+}
 
-        function closePopup() {
-            document.getElementById('emailPopup').style.display = 'none';
-        }
+function closePopup() {
+    const overlay = document.getElementById('emailPopup');
+    const content = overlay.querySelector('.popup-content');
+    
+    content.classList.remove('active');
+    // Wait for slide-down animation to complete before hiding overlay
+    setTimeout(() => {
+        overlay.classList.remove('active');
+    }, 500);
+}
 
-        document.getElementById('emailForm').addEventListener('submit', function() {
-            closePopup();
-        });
+// Random delay between 3-5 seconds
+const randomDelay = Math.floor(Math.random() * (5000 - 3000 + 1) + 3000);
+setTimeout(showPopup, randomDelay);
+
+document.getElementById('emailForm').addEventListener('submit', function() {
+    closePopup();
+});
     </script>
 </body>
 </html>
