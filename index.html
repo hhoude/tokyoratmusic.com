@@ -1,80 +1,17 @@
-// index.jsx or App.jsx
+// index.jsx
 import React, { useEffect, useRef, useState } from 'react';
-
-// CSS for cursor and global styles
-const globalStyles = `
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  cursor: none; /* Hide default cursor */
-}
-
-/* Add this to your CSS and make sure the path matches your image location */
-.custom-cursor {
-  width: 32px;
-  height: 32px;
-  background-image: url('/public/TR-Cursor-White-NoBG.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-}
-
-@keyframes severe-glitch {
-  0%, 100% { transform: translate(0) skew(0deg); }
-  20% { transform: translate(-10px, 5px) skew(10deg); }
-  40% { transform: translate(10px, -5px) skew(-5deg); }
-  60% { transform: translate(-5px, 2px) skew(2deg); }
-  80% { transform: translate(5px, -2px) skew(-8deg); }
-}
-
-@keyframes glitch-2 {
-  0%, 100% { transform: translate(2px, 0); }
-  50% { transform: translate(-2px, 2px); }
-}
-
-@keyframes glitch-3 {
-  0%, 100% { transform: translate(-2px, 0); }
-  50% { transform: translate(2px, -2px); }
-}
-
-@keyframes flicker {
-  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
-  20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
-}
-
-@keyframes noise {
-  0%, 100% { transform: translate(0); }
-  10% { transform: translate(-5px, -5px); }
-  20% { transform: translate(5px, 5px); }
-  30% { transform: translate(-3px, 3px); }
-  40% { transform: translate(3px, -3px); }
-  50% { transform: translate(0); }
-}
-
-@keyframes fall {
-  from { transform: translateY(0); }
-  to { transform: translateY(100vh); }
-}
-
-.animate-fall {
-  animation: fall 10s linear;
-}
-`;
 
 const TokyoRatLanding = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [binaryMatrices, setBinaryMatrices] = useState([]);
   const [currentText, setCurrentText] = useState('');
-  const [binaryText, setBinaryText] = useState('');
-  const phrases = ['MUSIC', 'VINYL', 'COMIC', 'MERCH'];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [binaryMatrices, setBinaryMatrices] = useState([]);
   const canvasRef = useRef(null);
+  
+  const phrases = ['MUSIC', 'VINYL', 'COMIC', 'MERCH'];
 
   useEffect(() => {
-    // Mouse movement handler
+    // Cursor tracking
     const handleMouseMove = (e) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
     };
@@ -83,8 +20,7 @@ const TokyoRatLanding = () => {
     // Canvas noise effect
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    let animationFrameId;
-
+    
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -103,55 +39,51 @@ const TokyoRatLanding = () => {
       }
       
       ctx.putImageData(imageData, 0, 0);
-      animationFrameId = requestAnimationFrame(generateNoise);
+      requestAnimationFrame(generateNoise);
     };
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     generateNoise();
 
-    // Binary matrix generation
-    const matrixInterval = setInterval(() => {
-      setBinaryMatrices(prevMatrices => {
+    // Binary matrix animation
+    const interval = setInterval(() => {
+      setBinaryMatrices(prev => {
         const newMatrix = {
           id: Math.random(),
           x: Math.random() * window.innerWidth,
-          y: -100,
+          y: -50,
           content: Array(10).fill(0).map(() => Math.random() > 0.5 ? '1' : '0').join('')
         };
-        return [...prevMatrices, newMatrix].slice(-50);
+        return [...prev, newMatrix].slice(-30); // Keep last 30 matrices
       });
-    }, 100);
-
-    // Text reveal effect
-    const generateBinary = () => {
-      return Array(30).fill(0).map(() => Math.random() > 0.5 ? '1' : '0').join('');
-    };
-
-    let index = 0;
-    const revealInterval = setInterval(() => {
-      if (index < phrases[currentIndex].length) {
-        setCurrentText(prev => phrases[currentIndex].slice(0, index + 1));
-        setBinaryText(generateBinary());
-        index++;
-      } else {
-        clearInterval(revealInterval);
-        setTimeout(() => {
-          if (currentIndex < phrases.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-            setCurrentText('');
-          }
-        }, 1000);
-      }
     }, 200);
 
-    // Cleanup
+    // Text reveal animation
+    let textInterval;
+    const startTextReveal = () => {
+      let charIndex = 0;
+      textInterval = setInterval(() => {
+        if (charIndex < phrases[currentIndex].length) {
+          setCurrentText(phrases[currentIndex].slice(0, charIndex + 1));
+          charIndex++;
+        } else {
+          clearInterval(textInterval);
+          setTimeout(() => {
+            setCurrentText('');
+            setCurrentIndex((prev) => (prev + 1) % phrases.length);
+          }, 1000);
+        }
+      }, 200);
+    };
+
+    startTextReveal();
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId);
-      clearInterval(matrixInterval);
-      clearInterval(revealInterval);
+      clearInterval(interval);
+      clearInterval(textInterval);
     };
   }, [currentIndex]);
 
@@ -159,28 +91,30 @@ const TokyoRatLanding = () => {
     <div className="min-h-screen bg-black text-white font-mono overflow-hidden relative">
       {/* Custom Cursor */}
       <div 
-        className="custom-cursor fixed"
-        style={{ 
-          left: `${cursorPosition.x - 16}px`,
-          top: `${cursorPosition.y - 16}px`
+        className="custom-cursor fixed pointer-events-none z-50"
+        style={{
+          left: `${cursorPosition.x}px`,
+          top: `${cursorPosition.y}px`,
+          transform: 'translate(-50%, -50%)'
         }}
       />
 
       {/* Noise Canvas */}
       <canvas 
         ref={canvasRef}
-        className="fixed top-0 left-0 w-full h-full opacity-10 pointer-events-none z-0"
+        className="fixed inset-0 opacity-10 pointer-events-none"
       />
 
-      {/* Binary Matrices */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Binary Rain Effect */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {binaryMatrices.map(matrix => (
           <div
             key={matrix.id}
-            className="absolute text-green-500 opacity-30 text-xs animate-fall"
+            className="absolute text-green-500 opacity-30 text-xs"
             style={{
-              left: matrix.x,
-              top: matrix.y
+              left: `${matrix.x}px`,
+              top: `${matrix.y}px`,
+              animation: 'fall 8s linear forwards'
             }}
           >
             {matrix.content}
@@ -189,40 +123,54 @@ const TokyoRatLanding = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
+      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
         {/* Logo */}
-        <div className="relative w-48 h-48 mb-12">
-          <div className="absolute inset-0 bg-red-600">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <path
-                d="M50 20 C60 20 70 30 70 40 L70 60 C70 70 60 80 50 80 C40 80 30 70 30 60 L30 40 C30 30 40 20 50 20 Z M40 45 L60 45 L50 65 Z"
-                fill="black"
-                className="animate-[severe-glitch_2s_infinite]"
-              />
-            </svg>
+        <div className="relative w-64 h-64 mb-12">
+          <div className="absolute inset-0">
+            <img
+              src="TR_mouse_fill_red.png"
+              alt="Tokyo Rat Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div className="absolute inset-0 bg-red-600 transform translate-x-2 opacity-80 animate-[glitch-2_4s_infinite]" />
-          <div className="absolute inset-0 bg-cyan-500 transform -translate-x-2 opacity-50 animate-[glitch-3_3s_infinite]" />
+          <div 
+            className="absolute inset-0 glitch-1"
+            style={{
+              backgroundImage: 'url(TR_mouse_fill_red.png)',
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          <div 
+            className="absolute inset-0 glitch-2"
+            style={{
+              backgroundImage: 'url(TR_mouse_fill_red.png)',
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
         </div>
 
         {/* Title */}
-        <h1 className="text-5xl tracking-[0.5em] uppercase mb-8 animate-[flicker_4s_infinite]">
+        <h1 className="text-5xl md:text-6xl tracking-[0.5em] uppercase mb-8 animate-flicker">
           Tokyo Rat
         </h1>
 
-        {/* Japanese Subtitle */}
-        <div className="text-xl tracking-[0.2em] mb-12">
+        {/* Japanese Text */}
+        <div className="text-xl md:text-2xl tracking-[0.2em] mb-12 text-red-600">
           東京ラット
         </div>
 
         {/* Coming Soon */}
-        <div className="text-2xl tracking-[0.3em] text-red-600 mb-12 animate-[severe-glitch_2s_infinite]">
+        <div className="text-2xl md:text-3xl tracking-[0.3em] text-red-600 mb-12 animate-pulse">
           COMING SOON
         </div>
 
         {/* Revealing Text */}
         <div className="h-24 flex items-center justify-center">
-          <div className="text-xl relative">
+          <div className="text-xl md:text-2xl relative">
             <span className="relative z-10">{currentText}</span>
             <span className="absolute top-0 left-0 text-red-500 opacity-50 transform translate-x-1">
               {currentText}
@@ -230,14 +178,72 @@ const TokyoRatLanding = () => {
             <span className="absolute top-0 left-0 text-cyan-500 opacity-50 transform -translate-x-1">
               {currentText}
             </span>
-            <div className="text-xs opacity-50 mt-2">{binaryText}</div>
           </div>
         </div>
-      </div>
+      </main>
 
-      <style jsx global>
-        {globalStyles}
-      </style>
+      <style jsx global>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          cursor: none;
+        }
+
+        .custom-cursor {
+          width: 32px;
+          height: 32px;
+          background-image: url('TR-Cursor-White-NoBG.png');
+          background-size: contain;
+          background-repeat: no-repeat;
+          mix-blend-mode: difference;
+        }
+
+        @keyframes fall {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(100vh); }
+        }
+
+        @keyframes flicker {
+          0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+          20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+        }
+
+        .animate-flicker {
+          animation: flicker 4s infinite;
+        }
+
+        .animate-pulse {
+          animation: pulse 2s infinite;
+        }
+
+        .glitch-1 {
+          animation: glitch1 4s infinite;
+          opacity: 0.7;
+          mix-blend-mode: screen;
+        }
+
+        .glitch-2 {
+          animation: glitch2 3s infinite;
+          opacity: 0.7;
+          mix-blend-mode: multiply;
+        }
+
+        @keyframes glitch1 {
+          0%, 100% { transform: translate(0); }
+          20% { transform: translate(2px, -2px); }
+          40% { transform: translate(-2px, 2px); }
+          60% { transform: translate(1px, -1px); }
+          80% { transform: translate(-1px, 1px); }
+        }
+
+        @keyframes glitch2 {
+          0%, 100% { transform: translate(0); }
+          25% { transform: translate(-2px, 0) scale(1.02); }
+          50% { transform: translate(2px, -1px) scale(0.98); }
+          75% { transform: translate(-1px, 1px) scale(1.02); }
+        }
+      `}</style>
     </div>
   );
 };
